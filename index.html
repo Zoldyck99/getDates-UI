@@ -140,6 +140,7 @@
                     return date1 - date2;
                 })
                 document.getElementById('output').innerHTML  = output.join('<br>');
+                location.href = "#output"
 
             } catch (err) {
                 console.log(err)
@@ -262,12 +263,12 @@
         }
         function copy(){
             navigator.clipboard.writeText(document.getElementById('output').innerText).then(() => {
+                location.href = "#clk"
                 document.getElementById('clk').innerText = "Copied!"
                 setTimeout(() => {
                     document.getElementById('clk').innerText = "Click to copy"
                     
                 }, 1500);
-                // alert("Copied to clipboard");
             });
         }
        
