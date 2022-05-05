@@ -1,19 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Fonts -->
-    <link
-    href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-    rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <!-- MDB -->
-    <link
-    href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.0.0/mdb.min.css"
-    rel="stylesheet"
-    />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.0.0/mdb.min.css" rel="stylesheet" />
 
     <style>
         hr {
@@ -22,6 +17,7 @@
     </style>
     <title>Get Dates</title>
 </head>
+
 <body>
     <div class="container">
         <div class="row mt-5">
@@ -70,39 +66,40 @@
                         <input class="form-check-input" type="checkbox" value="Sat" id="Saturdays" />
                         <label class="form-check-label" for="Saturdays">Saturdays</label>
                     </div>
-                    
+
                 </div>
                 <div class="col-md">
                     <h5>Start Date</h5>
-                    <input type="date" id="date" class="form-control-sm"/>
+                    <input type="date" id="date" class="form-control-sm" />
                 </div>
                 <div class="col-md">
                     <h5>Period</h5>
-                    <input type="number" id="period" class="form-control-sm" value="1"/>
+                    <input type="number" id="period" class="form-control-sm" value="1" />
                     <h6><small class="text-muted">In Months</small></h6>
                 </div>
                 <div class="col-md">
                     <h5>Format</h5>
                     <div class="form-check">
-                        <input class="form-check-input dateFormat" type="radio" name="dateFormat" id="f1" value="1" checked/>
+                        <input class="form-check-input dateFormat" type="radio" name="dateFormat" id="f1" value="1"
+                            checked />
                         <label class="form-check-label" for="f1"> YYYY-MM-DD </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input dateFormat" type="radio" name="dateFormat" id="f2" value="2"/>
+                        <input class="form-check-input dateFormat" type="radio" name="dateFormat" id="f2" value="2" />
                         <label class="form-check-label" for="f2"> YYYY/MM/DD </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input dateFormat" type="radio" name="dateFormat" id="f3" value="3"/>
+                        <input class="form-check-input dateFormat" type="radio" name="dateFormat" id="f3" value="3" />
                         <label class="form-check-label" for="f3"> YYYY Month DD </label>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="form-check">
-                        <input class="form-check-input direction" type="radio" value="1" id="Coming" name="direction" checked/>
+                        <input class="form-check-input direction" type="radio" value="1" id="Coming" name="direction" checked />
                         <label class="form-check-label" for="Coming"> Coming </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input direction" type="radio" value="-1" id="Passing" name="direction"/>
+                        <input class="form-check-input direction" type="radio" value="-1" id="Passing" name="direction" />
                         <label class="form-check-label" for="Passing"> Passing </label>
                     </div>
                 </div>
@@ -113,169 +110,15 @@
 
         <div class="row" style="margin-top: 20vh; margin-bottom: 20vh;">
             <h6 style="cursor: pointer;" id="clk" onclick="copy()">Click to copy</h6>
-            <div class="col d-flex justify-content-center py-5" onClick="copy()" style="cursor: pointer; background-color: rgb(229, 229, 229); border-radius: 25px; border-color: black;">
+            <div class="col d-flex justify-content-center py-5" onClick="copy()"
+                style="cursor: pointer; background-color: rgb(229, 229, 229); border-radius: 25px; border-color: black;">
                 <p class="fw-bold" id="output"></p>
             </div>
-        </div>            
+        </div>
     </div>
 
-    <script>
-        var output = [];
-        async function submit(){
-            try {
-                const days = [... document.querySelectorAll('input[type=checkbox]:checked')].map(e => e.value);
-                const startDate = document.getElementById('date').value.toString();
-                const period = Number( document.getElementById('period').value );
-                const dateFormat = [... document.querySelectorAll('.dateFormat:checked')].map(e => e.value);
-                const direction = [... document.querySelectorAll('.direction:checked')].map(e => e.value);
-                output = [];
-
-                await days.forEach( day => {
-                    output = [...output, ...getDates(day, startDate, period, dateFormat[0], direction[0])]
-                })
-                await output.sort( (a, b) => {
-                    const date1 = new Date(a)
-                    const date2 = new Date(b)
-                    
-                    return date1 - date2;
-                })
-                document.getElementById('output').innerHTML  = output.join('<br>');
-                location.href = "#output"
-
-            } catch (err) {
-                console.log(err)
-            }
-            
-        }
-        function getDates(weekDay='', startDate='', period=1, dateFormat=1, direction=1){
-            try {
-                let date = new Date(startDate);
-                let endMonth = new Date(startDate);
-
-                const arr = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-                if(! arr.includes(weekDay)) {throw "Week day is not specified properly! should be one of: " + arr;}
-                while(date.getDay() != arr.indexOf(weekDay)) {date.setDate(date.getDate() + 1);}    
-
-                let days = [];
-                let m;
-                let d;
-                let y;
-
-                if(direction == -1){    // passing dates
-                    endMonth.setMonth(date.getMonth() - period);  
-                    endMonth = endMonth.getMonth();
-
-                    if(dateFormat == 1){
-                        while (date.getMonth() != endMonth) {
-                            m = date.getMonth() + 1;
-                            d = date.getDate();
-                            y = date.getFullYear();
-                    
-                            days.push(
-                            y + '-' +
-                            (m < 10 ? '0' + m : m) + '-' +
-                            (d < 10 ? '0' + d : d)
-                            );
-                            date.setDate(date.getDate() - 7);
-                        }
-                    }else if(dateFormat == 2){
-                        while (date.getMonth() != endMonth) {
-                            m = date.getMonth() + 1;
-                            d = date.getDate();
-                            y = date.getFullYear();
-                    
-                            days.push(
-                            y + '/' +
-                            (m < 10 ? '0' + m : m) + '/' +
-                            (d < 10 ? '0' + d : d)
-                            );
-                            date.setDate(date.getDate() - 7);
-                        }
-                    }else{
-                        while (date.getMonth() != endMonth) {
-                            m = date.toLocaleString('default', { month: 'short' });
-                            d = date.getDate();
-                            y = date.getFullYear();
-                    
-                            days.push(
-                            y + ' ' +
-                            (m < 10 ? '0' + m : m) + ' ' +
-                            (d < 10 ? '0' + d : d)
-                            );
-                            date.setDate(date.getDate() - 7);
-                        }
-                    }
-
-
-                }else{      // coming dates
-                    endMonth.setMonth(date.getMonth() + period);  
-                    endMonth = endMonth.getMonth() + 1;
-
-                    if(dateFormat == 1){
-                        while (date.getMonth() != endMonth) {
-                            m = date.getMonth() + 1;
-                            d = date.getDate();
-                            y = date.getFullYear();
-                    
-                            days.push(
-                            y + '-' +
-                            (m < 10 ? '0' + m : m) + '-' +
-                            (d < 10 ? '0' + d : d)
-                            );
-                            date.setDate(date.getDate() + 7);
-                        }
-                    }else if(dateFormat == 2){
-                        while (date.getMonth() != endMonth) {
-                            m = date.getMonth() + 1;
-                            d = date.getDate();
-                            y = date.getFullYear();
-                    
-                            days.push(
-                            y + '/' +
-                            (m < 10 ? '0' + m : m) + '/' +
-                            (d < 10 ? '0' + d : d)
-                            );
-                            date.setDate(date.getDate() + 7);
-                        }            
-                    }else{
-                        while (date.getMonth() != endMonth) {
-                            m = date.toLocaleString('default', { month: 'short' });
-                            d = date.getDate();
-                            y = date.getFullYear();
-                    
-                            days.push(
-                            y + ' ' +
-                            (m < 10 ? '0' + m : m) + ' ' +
-                            (d < 10 ? '0' + d : d)
-                            );
-                            date.setDate(date.getDate() + 7);
-                        }      
-                    }
-
-                }
-
-
-                return days;
-            } catch (err) {
-                console.log(err)
-            }
-          
-        }
-        function copy(){
-            navigator.clipboard.writeText(document.getElementById('output').innerText).then(() => {
-                location.href = "#clk"
-                document.getElementById('clk').innerText = "Copied!"
-                setTimeout(() => {
-                    document.getElementById('clk').innerText = "Click to copy"
-                    
-                }, 1500);
-            });
-        }
-       
-
-
-
-    </script>
+    <script src="script.js"></script>
 
 </body>
+
 </html>
